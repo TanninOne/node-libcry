@@ -1,0 +1,15 @@
+{
+  "name": "node-pakdecrypt",
+  "version": "1.0.0",
+  "description": "allows decryption of cryengine pak files",
+  "main": "index.js",
+  "scripts": {
+    "install": "autogypi && node-gyp configure build"
+  },
+  "license": "GPL-3.0",
+  "dependencies": {
+    "autogypi": "^0.2.2",
+    "nan": "^2.14.0",
+    "node-gyp": "^6.1.0"
+  }
+}
