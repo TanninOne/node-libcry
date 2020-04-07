@@ -1,5 +1,5 @@
 {
-  "name": "node-pakdecrypt",
+  "name": "node-libcrypak",
   "version": "1.0.0",
   "description": "allows decryption of cryengine pak files",
   "main": "index.js",

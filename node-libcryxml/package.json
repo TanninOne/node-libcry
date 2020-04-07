@@ -4,7 +4,7 @@
   "description": "allows decoding of cryengine binary xml files",
   "main": "index.js",
   "scripts": {
-    "install": "autogypi && node-gyp configure build"
+    "install": "node build_base.js && autogypi && node-gyp configure build"
   },
   "license": "GPL-3.0",
   "dependencies": {

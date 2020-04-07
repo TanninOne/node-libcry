@@ -1,7 +1,7 @@
 {
     "targets": [
         {
-            "target_name": "pakdecrypt",
+            "target_name": "crypak",
             "includes": [
                 "auto.gypi"
             ],
@@ -13,13 +13,13 @@
                 }]
             ],
             "include_dirs": [
-              "../libpakdecrypt",
+              "./libcrypak/src",
             ],
             "library_dirs": [
-              "../x64/Release",
+              "./libcrypak/dist",
             ],
             "libraries": [
-              "libpakdecrypt"
+              "libcrypak"
             ],
             "cflags!": ["-fno-exceptions"],
             "cflags_cc!": ["-fno-exceptions"],

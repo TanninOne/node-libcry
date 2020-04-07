@@ -13,10 +13,10 @@
                 }]
             ],
             "include_dirs": [
-              "../libcryxml",
+              "./libcryxml",
             ],
             "library_dirs": [
-              "../x64/Release",
+              "./libcryxml/dist",
             ],
             "libraries": [
               "libcryxml"
