@@ -10,6 +10,43 @@ Local<String> operator "" _n(const char *input, size_t) {
   return Nan::New(input).ToLocalChecked();
 }
 
+uint8_t hexToByte(const char input) {
+  static const char charMap[] = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, // numbers
+                                 -1, -1, -1, -1, -1, -1, -1,    // symbols
+                                  10, 11, 12, 13, 14, 15,       // A-F
+                                 -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, // remaining upper case characters
+                                 -1, -1, -1, -1, -1, -1,        // symbols
+                                  10, 11, 12, 13, 14, 15,       // a-f
+  };
+
+  if ((input < '0') || (input > 'f')) {
+    throw std::runtime_error("not a hex character");
+  }
+  uint8_t res =  charMap[input - '0'];
+  if (res < 0) {
+    throw std::runtime_error("not a hex character");
+  }
+
+  return res;
+}
+
+std::vector<uint8_t> hexToBin(const char *input) {
+  std::vector<uint8_t> result;
+  for (; *input != '\0'; input += 2) {
+    while ((*input == ' ') || (input[0] == '0') && input[1] == 'x') {
+      ++input;
+    }
+    if (input[1] == ' ') {
+      // support stuff like "0xb" or "00 b af"
+      result.push_back(hexToByte(input[0]));
+    }
+    else {
+      result.push_back(hexToByte(input[0]) << 4 | hexToByte(input[1]));
+    }
+  }
+  return result;
+}
+
 NAN_METHOD(decryptWrap) {
   Local<Context> context = Nan::GetCurrentContext();
   Isolate *isolate = context->GetIsolate();
@@ -21,9 +58,12 @@ NAN_METHOD(decryptWrap) {
 
   String::Utf8Value sourceV8(isolate, info[0]->ToString(context).ToLocalChecked());
   String::Utf8Value destinationV8(isolate, info[1]->ToString(context).ToLocalChecked());
+  // key is expected to be a hex string without spaces or 0x prepended (e.g. 8badf00d) but
+  // the hex parser is somewhat permissive
   String::Utf8Value keyV8(isolate, info[2]->ToString(context).ToLocalChecked());
+  std::vector<uint8_t> keyBuffer = hexToBin(*keyV8);
 
-  int res = pak_decrypt(*sourceV8, *destinationV8, *keyV8);
+  int res = pak_decrypt(*sourceV8, *destinationV8, keyBuffer.data(), keyBuffer.size());
 
   if (res != 0) {
     Local<Object> err = Nan::Error(pak_error_to_string(res)).As<Object>();
@@ -43,6 +83,7 @@ NAN_METHOD(decryptFilesWrap) {
 
   String::Utf8Value sourceV8(isolate, info[0]->ToString(context).ToLocalChecked());
   String::Utf8Value keyV8(isolate, info[1]->ToString(context).ToLocalChecked());
+  std::vector<uint8_t> keyBuffer = hexToBin(*keyV8);
   Local<Array> files = Local<Array>::Cast(info[2]);
 
   std::vector<const char*> fileNames;
@@ -66,7 +107,7 @@ NAN_METHOD(decryptFilesWrap) {
   char **buffers = nullptr;
   int *bufferSizes = nullptr;
 
-  int res = pak_decrypt_files(*sourceV8, *keyV8, &fileNames[0], fileNames.size(), &buffers, &bufferSizes);
+  int res = pak_decrypt_files(*sourceV8, keyBuffer.data(), keyBuffer.size(), &fileNames[0], fileNames.size(), &buffers, &bufferSizes);
 
   ON_BLOCK_EXIT([&]() {
     pak_free_array((void**)buffers, fileNames.size());
@@ -101,9 +142,11 @@ NAN_METHOD(listFilesWrap) {
 
   String::Utf8Value sourceV8(isolate, info[0]->ToString(context).ToLocalChecked());
   String::Utf8Value keyV8(isolate, info[1]->ToString(context).ToLocalChecked());
+  std::vector<uint8_t> keyBuffer = hexToBin(*keyV8);
+  Local<Array> files = Local<Array>::Cast(info[2]);
 
   char *fileNames;
-  int res = pak_list_files(*sourceV8, *keyV8, &fileNames);
+  int res = pak_list_files(*sourceV8, keyBuffer.data(), keyBuffer.size(), &fileNames);
 
   if (res != 0) {
     Local<Object> err = Nan::Error(pak_error_to_string(res)).As<Object>();

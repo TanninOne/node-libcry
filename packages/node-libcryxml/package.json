@@ -1,5 +1,5 @@
 {
-  "name": "node-cryxml",
+  "name": "cryxml",
   "version": "1.0.0",
   "description": "allows decoding of cryengine binary xml files",
   "main": "index.js",
