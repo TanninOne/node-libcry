@@ -6,12 +6,12 @@ const path = require('path');
 
 const execFile = util.promisify(cp.execFile);
 
-const CLONE_PATH = 'libcrypak';
+const CLONE_PATH = 'libcryxml';
 
 async function main() {
     try {
         try {
-            await git.clone('https://github.com/TanninOne/libcrypak', 'master', CLONE_PATH, {});
+            await git.clone('https://github.com/TanninOne/libcryxml', 'master', CLONE_PATH, {});
         } catch (err) {
             // an error with code 128 is emitted when the output directory already exists
             if (err.code !== 128) {

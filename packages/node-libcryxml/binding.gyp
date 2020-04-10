@@ -13,7 +13,7 @@
                 }]
             ],
             "include_dirs": [
-              "./libcryxml",
+              "./libcryxml/src",
             ],
             "library_dirs": [
               "./libcryxml/dist",
