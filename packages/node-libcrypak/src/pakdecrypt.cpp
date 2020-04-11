@@ -145,13 +145,19 @@ NAN_METHOD(listFilesWrap) {
   std::vector<uint8_t> keyBuffer = hexToBin(*keyV8);
   Local<Array> files = Local<Array>::Cast(info[2]);
 
-  char *fileNames;
+  char *fileNames = nullptr;
   int res = pak_list_files(*sourceV8, keyBuffer.data(), keyBuffer.size(), &fileNames);
 
   if (res != 0) {
     Local<Object> err = Nan::Error(pak_error_to_string(res)).As<Object>();
     err->Set(context, "errorCode"_n, Nan::New(res));
     Nan::ThrowError(err.As<Value>());
+    return;
+  }
+
+  if ((res == 0) && (fileNames == nullptr)) {
+    Nan::ThrowError("Empty result but no error code");
+    return;
   }
 
   Local<Array> result = Nan::New<Array>();
