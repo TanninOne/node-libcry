@@ -2,4 +2,7 @@ auto-top.gypi
 auto.gypi  
 build  
 libcrypak  
+libcryxml
 node_modules  
+dist  
+yarn-error.log  
