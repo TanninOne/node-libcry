@@ -29,6 +29,7 @@ NAN_METHOD(decodeFileWrap) {
     Local<Object> err = Nan::Error(cryxml_error_to_string(res)).As<Object>();
     err->Set(context, "errorCode"_n, Nan::New(res));
     Nan::ThrowError(err.As<Value>());
+    return;
   }
 }
 
@@ -62,7 +63,10 @@ NAN_METHOD(decodeBufferWrap) {
     Local<Object> err = Nan::Error(cryxml_error_to_string(res)).As<Object>();
     err->Set(context, "errorCode"_n, Nan::New(res));
     Nan::ThrowError(err.As<Value>());
+    return;
   }
+
+  info.GetReturnValue().Set(Nan::New<String>(decoded).ToLocalChecked());
 }
 
 NAN_MODULE_INIT(Init) {

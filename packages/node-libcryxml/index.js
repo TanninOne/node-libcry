@@ -1,3 +1,3 @@
-const lib = require('./build/Debug/cryxml')
+const lib = require('./build/Release/cryxml')
 
 module.exports = lib
